@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.sp
 import com.htogo.app.ui.theme.HToGoColors
 import com.htogo.app.ui.theme.HToGoTheme
 
-enum class TipoPedido { DIRECTO, ABIERTO }
+//enum class TipoPedido { DIRECTO, ABIERTO }
 
 data class PedidoDisponible(
     val id: String,

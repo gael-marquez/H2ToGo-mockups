@@ -26,7 +26,7 @@ import com.htogo.app.ui.components.HToGoTextButton
 import com.htogo.app.ui.components.HToGoTextField
 import com.htogo.app.ui.theme.HToGoColors
 import com.htogo.app.ui.theme.HToGoTheme
-
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 fun RegistroScreen(
     onBack: () -> Unit = {},

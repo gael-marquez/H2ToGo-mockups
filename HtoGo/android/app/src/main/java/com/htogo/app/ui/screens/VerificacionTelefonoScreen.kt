@@ -30,7 +30,7 @@ import com.htogo.app.ui.components.HToGoTextButton
 import com.htogo.app.ui.theme.HToGoColors
 import com.htogo.app.ui.theme.HToGoTheme
 import kotlinx.coroutines.delay
-
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 fun VerificacionTelefonoScreen(
     onBack: () -> Unit = {},

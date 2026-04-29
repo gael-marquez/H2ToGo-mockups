@@ -22,6 +22,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import com.htogo.app.ui.theme.HToGoColors
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun HToGoTextField(

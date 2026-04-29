@@ -197,7 +197,10 @@ fun RutaEntregaScreen(
         if (mostrarModalNoEntregado) {
             ModalNoEntregado(
                 onDismiss = { mostrarModalNoEntregado = false },
-                onConfirm = { mostrarModalNoEntregado = false }
+                onConfirm = { motivo, nota ->
+                    mostrarModalNoEntregado = false
+                    // Más adelante aquí podrás mandar a la base de datos el 'motivo' y la 'nota'
+                }
             )
         }
     }

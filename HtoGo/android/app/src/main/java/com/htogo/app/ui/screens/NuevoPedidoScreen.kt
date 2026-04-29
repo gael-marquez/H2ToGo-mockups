@@ -62,7 +62,7 @@ private val SAMPLE_BRANDS = listOf(
 
 private const val PURIFICADORA_NAME = "Aguas Del Valle"
 
-private enum class TipoPedido { DIRECTA, ABIERTO }
+//private enum class TipoPedido { DIRECTA, ABIERTO }
 
 @Composable
 private fun SectionTitle(text: String) {
