@@ -11,12 +11,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.DirectionsCar
-import androidx.compose.material.icons.filled.Inventory2
-import androidx.compose.material.icons.filled.LocalShipping
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Payments
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Storefront
@@ -37,16 +34,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.htogo.app.ui.components.EstadoPedido
 import com.htogo.app.ui.components.EstadoPedidoChip
+import com.htogo.app.ui.components.RepartidorBottomBar
+import com.htogo.app.ui.components.RepartidorTab
 import com.htogo.app.ui.theme.HToGoColors
 import com.htogo.app.ui.theme.HToGoTheme
 
 @Composable
 fun HomeRepartidorScreen(
-    onPedidos: () -> Unit = {},
     onInventario: () -> Unit = {},
     onIngresos: () -> Unit = {},
     onPerfil: () -> Unit = {},
     onRuta: () -> Unit = {},
+    onPedidoProgramado: () -> Unit = {},
     onSwitchRol: () -> Unit = {}
 ) {
     val nombre = "Carlos"
@@ -56,9 +55,9 @@ fun HomeRepartidorScreen(
         containerColor = HToGoColors.Background,
         bottomBar = {
             RepartidorBottomBar(
-                selected = 0,
-                onPedidos = onPedidos,
-                onInventario = onInventario,
+                selected = RepartidorTab.INICIO,
+                onInicio = {},
+                onNegocio = onInventario,
                 onIngresos = onIngresos,
                 onPerfil = onPerfil
             )
@@ -314,19 +313,22 @@ fun HomeRepartidorScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    "Pedidos en cola (3)",
+                    "Pedidos apartados aceptados (3)",
                     style = MaterialTheme.typography.titleMedium,
                     color = HToGoColors.TextPrimary,
                     modifier = Modifier.weight(1f)
                 )
-                TextButton(onClick = onPedidos) {
-                    Text("Ver todos", color = HToGoColors.Primary, fontWeight = FontWeight.SemiBold)
-                }
             }
+            Text(
+                "Pedidos programados que ya te apartaste",
+                fontSize = 12.sp,
+                color = HToGoColors.TextSecondary,
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 2.dp)
+            )
             Spacer(Modifier.height(4.dp))
-            ColaItem("HG-1290", "María L.", "Col. Nápoles", "5 garrafones", "$200", EstadoPedido.PENDIENTE, onPedidos)
-            ColaItem("HG-1292", "Roberto V.", "Col. Narvarte", "2 garrafones", "$80", EstadoPedido.PENDIENTE, onPedidos)
-            ColaItem("HG-1295", "Lucía F.", "Col. Del Valle", "4 garrafones", "$160", EstadoPedido.PENDIENTE, onPedidos)
+            ColaItem("HG-1290", "María L.", "Col. Nápoles", "5 garrafones", "$200", EstadoPedido.ASIGNADO, onPedidoProgramado)
+            ColaItem("HG-1292", "Roberto V.", "Col. Narvarte", "2 garrafones", "$80", EstadoPedido.ASIGNADO, onPedidoProgramado)
+            ColaItem("HG-1295", "Lucía F.", "Col. Del Valle", "4 garrafones", "$160", EstadoPedido.ASIGNADO, onPedidoProgramado)
         }
     }
 }
@@ -388,39 +390,6 @@ private fun ColaItem(
                 Text(cant, fontSize = 12.sp, color = HToGoColors.TextSecondary)
             }
             Text(monto, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = HToGoColors.PrimaryDark)
-        }
-    }
-}
-
-@Composable
-private fun RepartidorBottomBar(
-    selected: Int,
-    onPedidos: () -> Unit,
-    onInventario: () -> Unit,
-    onIngresos: () -> Unit,
-    onPerfil: () -> Unit
-) {
-    NavigationBar(containerColor = Color.White, tonalElevation = 8.dp) {
-        val items = listOf(
-            Triple("Pedidos", Icons.Filled.LocalShipping, onPedidos),
-            Triple("Inventario", Icons.Filled.Inventory2, onInventario),
-            Triple("Ingresos", Icons.Filled.Payments, onIngresos),
-            Triple("Perfil", Icons.Filled.Person, onPerfil)
-        )
-        items.forEachIndexed { i, (label, icon, action) ->
-            NavigationBarItem(
-                selected = i == selected,
-                onClick = action,
-                icon = { Icon(icon, null) },
-                label = { Text(label) },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = HToGoColors.Primary,
-                    selectedTextColor = HToGoColors.Primary,
-                    indicatorColor = HToGoColors.PrimarySoft,
-                    unselectedIconColor = HToGoColors.TextTertiary,
-                    unselectedTextColor = HToGoColors.TextTertiary
-                )
-            )
         }
     }
 }

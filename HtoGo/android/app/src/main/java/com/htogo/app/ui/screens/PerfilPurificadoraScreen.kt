@@ -2,10 +2,8 @@ package com.htogo.app.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,20 +12,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.DirectionsBike
-import androidx.compose.material.icons.filled.LocalShipping
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Storefront
-import androidx.compose.material.icons.filled.TwoWheeler
 import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -57,13 +50,10 @@ private enum class StockEstado(val label: String, val color: Color) {
     AGOTADO("Agotado", HToGoColors.TextTertiary)
 }
 
-private data class Vehiculo(val tipo: String, val capacidad: String, val icon: ImageVector)
-
 @Composable
 fun PerfilPurificadoraScreen(
     nombre: String = "Aguas Del Valle",
     distancia: String = "0.8 km",
-    eta: String = "12 min",
     direccion: String = "Av. Cuauhtémoc 1102, Benito Juárez",
     horario: String = "Lun–Sáb · 8:00 AM – 7:00 PM",
     diasCerrados: String = "Cerrado los domingos",
@@ -76,12 +66,6 @@ fun PerfilPurificadoraScreen(
         Producto("Ciel", "20 L", "$45 c/u", StockEstado.DISPONIBLE),
         Producto("Bonafont", "20 L", "$48 c/u", StockEstado.DISPONIBLE),
         Producto("Epura", "20 L", "$42 c/u", StockEstado.POCOS),
-        Producto("Ciel", "10 L", "$28 c/u", StockEstado.AGOTADO),
-    )
-    val vehiculos = listOf(
-        Vehiculo("Camioneta Nissan", "hasta 25 garrafones", Icons.Filled.LocalShipping),
-        Vehiculo("Moto Italika DS-150", "hasta 8 garrafones", Icons.Filled.TwoWheeler),
-        Vehiculo("Bicicleta Mercurio", "hasta 4 garrafones", Icons.Filled.DirectionsBike),
     )
 
     Scaffold(
@@ -103,22 +87,13 @@ fun PerfilPurificadoraScreen(
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
         ) {
-            HeaderPurificadora(nombre, distancia, eta, abiertoAhora, onBack)
+            HeaderPurificadora(nombre, distancia, abiertoAhora, onBack)
             MiniMapa()
             Spacer(Modifier.height(20.dp))
             DatosNegocio(direccion, horario, diasCerrados, abiertoAhora, tiempoEnPlataforma)
             Spacer(Modifier.height(20.dp))
             SectionTitle("Productos disponibles")
             productos.forEach { ProductoRow(it) }
-            Spacer(Modifier.height(20.dp))
-            SectionTitle("Vehículos del negocio")
-            Spacer(Modifier.height(8.dp))
-            LazyRow(
-                contentPadding = PaddingValues(horizontal = 20.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(vehiculos) { VehiculoCard(it) }
-            }
             Spacer(Modifier.height(96.dp))
         }
     }
@@ -126,7 +101,7 @@ fun PerfilPurificadoraScreen(
 
 @Composable
 private fun HeaderPurificadora(
-    nombre: String, distancia: String, eta: String, abierto: Boolean, onBack: () -> Unit
+    nombre: String, distancia: String, abierto: Boolean, onBack: () -> Unit
 ) {
     Box(
         Modifier
@@ -167,11 +142,6 @@ private fun HeaderPurificadora(
                     modifier = Modifier.size(14.dp))
                 Spacer(Modifier.width(4.dp))
                 Text(distancia, color = HToGoColors.PrimarySoft, fontSize = 13.sp)
-                Spacer(Modifier.width(12.dp))
-                Icon(Icons.Filled.Schedule, null, tint = HToGoColors.PrimarySoft,
-                    modifier = Modifier.size(14.dp))
-                Spacer(Modifier.width(4.dp))
-                Text("ETA $eta", color = HToGoColors.PrimarySoft, fontSize = 13.sp)
             }
         }
     }
@@ -334,37 +304,6 @@ private fun StockChip(stock: StockEstado) {
     ) {
         Text(stock.label, color = stock.color, fontSize = 11.sp,
             fontWeight = FontWeight.SemiBold)
-    }
-}
-
-@Composable
-private fun VehiculoCard(v: Vehiculo) {
-    Card(
-        modifier = Modifier.width(160.dp).height(120.dp),
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-    ) {
-        Column(
-            Modifier.fillMaxSize().padding(12.dp),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            Box(
-                Modifier
-                    .size(40.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(HToGoColors.PrimaryWash),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(v.icon, null, tint = HToGoColors.Primary,
-                    modifier = Modifier.size(22.dp))
-            }
-            Column {
-                Text(v.tipo, fontSize = 13.sp, fontWeight = FontWeight.SemiBold,
-                    color = HToGoColors.TextPrimary, maxLines = 2)
-                Text(v.capacidad, fontSize = 11.sp, color = HToGoColors.TextSecondary)
-            }
-        }
     }
 }
 

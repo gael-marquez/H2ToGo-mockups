@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.LocalShipping
 import androidx.compose.material.icons.filled.MoveToInbox
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.material.icons.filled.SwapHoriz
@@ -38,6 +39,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.htogo.app.ui.components.RepartidorBottomBar
+import com.htogo.app.ui.components.RepartidorTab
 import com.htogo.app.ui.theme.HToGoColors
 import com.htogo.app.ui.theme.HToGoTheme
 
@@ -69,10 +72,17 @@ private data class MarcaVehiculoStock(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InventarioVehiculoScreen(onBack: () -> Unit = {}) {
+fun InventarioVehiculoScreen(
+    onBack: () -> Unit = {},
+    onInicio: () -> Unit = {},
+    onIngresos: () -> Unit = {},
+    onPerfil: () -> Unit = {}
+) {
     var tab by remember { mutableStateOf(TabInventario.EN_BASE) }
     var showRegistrarEntrada by remember { mutableStateOf(false) }
     var showCargarVehiculo by remember { mutableStateOf(false) }
+    var showSalidaManual by remember { mutableStateOf(false) }
+    var showSolicitarCambio by remember { mutableStateOf(false) }
 
     val marcasBase = remember {
         listOf(
@@ -118,6 +128,15 @@ fun InventarioVehiculoScreen(onBack: () -> Unit = {}) {
                 TabsInventario(tab) { tab = it }
                 Spacer(Modifier.height(14.dp))
             }
+        },
+        bottomBar = {
+            RepartidorBottomBar(
+                selected = RepartidorTab.NEGOCIO,
+                onInicio = onInicio,
+                onNegocio = {},
+                onIngresos = onIngresos,
+                onPerfil = onPerfil
+            )
         }
     ) { padding ->
         LazyColumn(
@@ -144,6 +163,32 @@ fun InventarioVehiculoScreen(onBack: () -> Unit = {}) {
                             Text("Registrar entrada", fontWeight = FontWeight.SemiBold)
                         }
                     }
+                    item {
+                        OutlinedButton(
+                            onClick = { showSalidaManual = true },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(54.dp),
+                            shape = RoundedCornerShape(14.dp),
+                            border = BorderStroke(1.5.dp, HToGoColors.AccentRose)
+                        ) {
+                            Icon(Icons.AutoMirrored.Filled.Logout, null, tint = HToGoColors.AccentRose)
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                "Registrar salida manual",
+                                color = HToGoColors.AccentRose,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
+                    item {
+                        Text(
+                            "Usa salida manual para mermas, roturas o entregas que no pasaron por la app.",
+                            fontSize = 11.sp,
+                            color = HToGoColors.TextTertiary,
+                            modifier = Modifier.padding(horizontal = 4.dp)
+                        )
+                    }
                 }
                 TabInventario.EN_VEHICULO -> {
                     item { ResumenVehiculoCard() }
@@ -165,7 +210,7 @@ fun InventarioVehiculoScreen(onBack: () -> Unit = {}) {
                     items(marcasVehiculo) { m -> MarcaVehiculoCard(m) }
                 }
                 TabInventario.VEHICULO -> {
-                    item { VehiculoDetalleCard() }
+                    item { VehiculoDetalleCard(onSolicitarCambio = { showSolicitarCambio = true }) }
                 }
             }
         }
@@ -182,6 +227,15 @@ fun InventarioVehiculoScreen(onBack: () -> Unit = {}) {
             marcas = marcasBase,
             onDismiss = { showCargarVehiculo = false }
         )
+    }
+    if (showSalidaManual) {
+        SalidaManualDialog(
+            marcas = marcasBase,
+            onDismiss = { showSalidaManual = false }
+        )
+    }
+    if (showSolicitarCambio) {
+        SolicitarCambioVehiculoDialog(onDismiss = { showSolicitarCambio = false })
     }
 }
 
@@ -474,7 +528,7 @@ private fun MarcaVehiculoCard(m: MarcaVehiculoStock) {
 }
 
 @Composable
-private fun VehiculoDetalleCard() {
+private fun VehiculoDetalleCard(onSolicitarCambio: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(18.dp),
@@ -516,7 +570,8 @@ private fun VehiculoDetalleCard() {
                     )
                     Surface(
                         shape = RoundedCornerShape(8.dp),
-                        color = HToGoColors.PrimarySoft
+                        color = HToGoColors.PrimarySoft,
+                        modifier = Modifier.clickable(onClick = onSolicitarCambio)
                     ) {
                         Text(
                             "Solicitar cambio",
@@ -835,6 +890,228 @@ private fun QtyStepper(value: Int, max: Int, onChange: (Int) -> Unit) {
                 .clip(RoundedCornerShape(50))
                 .background(HToGoColors.PrimarySoft)
         ) { Icon(Icons.Filled.Add, null, tint = HToGoColors.Primary) }
+    }
+}
+
+@Composable
+private fun SalidaManualDialog(marcas: List<MarcaBaseStock>, onDismiss: () -> Unit) {
+    var seleccionada by remember { mutableStateOf(marcas.firstOrNull()?.id ?: "") }
+    val seleccionMarca = marcas.firstOrNull { it.id == seleccionada } ?: marcas.first()
+    var cantidad by remember { mutableStateOf(1) }
+    var motivo by remember { mutableStateOf("Merma / rotura") }
+    val motivos = listOf("Merma / rotura", "Entrega fuera de la app", "Devolución a proveedor", "Ajuste de inventario")
+
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = RoundedCornerShape(20.dp),
+            color = Color.White,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(Modifier.padding(20.dp)) {
+                Text("Registrar salida manual", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    "Resta garrafones de la base por una razón distinta a un pedido en la app.",
+                    fontSize = 13.sp, color = HToGoColors.TextSecondary
+                )
+                Spacer(Modifier.height(14.dp))
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(HToGoColors.AccentRose.copy(alpha = .12f))
+                        .padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.AutoMirrored.Filled.Logout, null, tint = HToGoColors.AccentRose)
+                    Spacer(Modifier.width(10.dp))
+                    Column {
+                        Text("Origen: Base del negocio", fontSize = 13.sp,
+                            color = HToGoColors.AccentRose, fontWeight = FontWeight.SemiBold)
+                        Text("Esta acción queda en bitácora", fontSize = 11.sp, color = HToGoColors.TextSecondary)
+                    }
+                }
+                Spacer(Modifier.height(12.dp))
+                Text("MARCA", fontSize = 11.sp, color = HToGoColors.TextSecondary, fontWeight = FontWeight.SemiBold)
+                Spacer(Modifier.height(6.dp))
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    marcas.forEach { m ->
+                        val sel = m.id == seleccionada
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(10.dp))
+                                .border(
+                                    1.dp,
+                                    if (sel) HToGoColors.Primary else HToGoColors.OutlineSoft,
+                                    RoundedCornerShape(10.dp)
+                                )
+                                .background(if (sel) HToGoColors.PrimaryWash else Color.White)
+                                .clickable {
+                                    seleccionada = m.id
+                                    cantidad = minOf(cantidad, m.enBase)
+                                }
+                                .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                "${m.nombre} · ${m.capacidad} — ${m.enBase} en base",
+                                fontSize = 13.sp, fontWeight = FontWeight.Medium,
+                                modifier = Modifier.weight(1f)
+                            )
+                            if (sel) Icon(Icons.Filled.CheckCircle, null, tint = HToGoColors.Primary,
+                                modifier = Modifier.size(18.dp))
+                        }
+                    }
+                }
+                Spacer(Modifier.height(14.dp))
+                Text("CANTIDAD A RESTAR", fontSize = 11.sp, color = HToGoColors.TextSecondary,
+                    fontWeight = FontWeight.SemiBold)
+                QtyStepper(cantidad, max = seleccionMarca.enBase) { cantidad = it }
+                Spacer(Modifier.height(14.dp))
+                Text("MOTIVO", fontSize = 11.sp, color = HToGoColors.TextSecondary,
+                    fontWeight = FontWeight.SemiBold)
+                Spacer(Modifier.height(6.dp))
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    motivos.forEach { m ->
+                        val sel = m == motivo
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(10.dp))
+                                .border(
+                                    1.dp,
+                                    if (sel) HToGoColors.AccentRose else HToGoColors.OutlineSoft,
+                                    RoundedCornerShape(10.dp)
+                                )
+                                .background(if (sel) HToGoColors.AccentRose.copy(alpha = .06f) else Color.White)
+                                .clickable { motivo = m }
+                                .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(m, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                            if (sel) Icon(Icons.Filled.CheckCircle, null, tint = HToGoColors.AccentRose,
+                                modifier = Modifier.size(16.dp))
+                        }
+                    }
+                }
+                Spacer(Modifier.height(18.dp))
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton(
+                        onClick = onDismiss,
+                        modifier = Modifier.weight(1f).height(46.dp),
+                        shape = RoundedCornerShape(23.dp)
+                    ) { Text("Cancelar") }
+                    Button(
+                        onClick = onDismiss,
+                        modifier = Modifier.weight(1f).height(46.dp),
+                        shape = RoundedCornerShape(23.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = HToGoColors.AccentRose)
+                    ) { Text("Confirmar salida", fontWeight = FontWeight.SemiBold) }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SolicitarCambioVehiculoDialog(onDismiss: () -> Unit) {
+    var tipoNuevo by remember { mutableStateOf("Camioneta") }
+    var placas by remember { mutableStateOf("") }
+    var motivo by remember { mutableStateOf("") }
+    val tipos = listOf("Camioneta", "Pickup", "Motocicleta", "Bicicleta de carga")
+
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = RoundedCornerShape(20.dp),
+            color = Color.White,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(Modifier.padding(20.dp)) {
+                Text("Solicitar cambio de vehículo", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    "El admin revisará tu solicitud y te avisará cuando se apruebe.",
+                    fontSize = 13.sp, color = HToGoColors.TextSecondary
+                )
+                Spacer(Modifier.height(14.dp))
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(HToGoColors.PrimarySoft)
+                        .padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Filled.SwapHoriz, null, tint = HToGoColors.Primary)
+                    Spacer(Modifier.width(10.dp))
+                    Column {
+                        Text("Vehículo actual: Camioneta · PJU-432-A",
+                            fontSize = 13.sp, color = HToGoColors.PrimaryDark,
+                            fontWeight = FontWeight.SemiBold)
+                        Text("Capacidad 25 garrafones",
+                            fontSize = 11.sp, color = HToGoColors.TextSecondary)
+                    }
+                }
+                Spacer(Modifier.height(14.dp))
+                Text("NUEVO TIPO DE VEHÍCULO", fontSize = 11.sp, color = HToGoColors.TextSecondary,
+                    fontWeight = FontWeight.SemiBold)
+                Spacer(Modifier.height(6.dp))
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    tipos.forEach { t ->
+                        val sel = t == tipoNuevo
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(10.dp))
+                                .border(
+                                    1.dp,
+                                    if (sel) HToGoColors.Primary else HToGoColors.OutlineSoft,
+                                    RoundedCornerShape(10.dp)
+                                )
+                                .background(if (sel) HToGoColors.PrimaryWash else Color.White)
+                                .clickable { tipoNuevo = t }
+                                .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(t, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                            if (sel) Icon(Icons.Filled.CheckCircle, null, tint = HToGoColors.Primary,
+                                modifier = Modifier.size(16.dp))
+                        }
+                    }
+                }
+                Spacer(Modifier.height(14.dp))
+                OutlinedTextField(
+                    value = placas,
+                    onValueChange = { placas = it },
+                    label = { Text("Placas del nuevo vehículo") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+                Spacer(Modifier.height(10.dp))
+                OutlinedTextField(
+                    value = motivo,
+                    onValueChange = { motivo = it },
+                    label = { Text("Motivo del cambio") },
+                    modifier = Modifier.fillMaxWidth(),
+                    minLines = 2
+                )
+                Spacer(Modifier.height(18.dp))
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton(
+                        onClick = onDismiss,
+                        modifier = Modifier.weight(1f).height(46.dp),
+                        shape = RoundedCornerShape(23.dp)
+                    ) { Text("Cancelar") }
+                    Button(
+                        onClick = onDismiss,
+                        modifier = Modifier.weight(1f).height(46.dp),
+                        shape = RoundedCornerShape(23.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = HToGoColors.Primary)
+                    ) { Text("Enviar solicitud", fontWeight = FontWeight.SemiBold) }
+                }
+            }
+        }
     }
 }
 

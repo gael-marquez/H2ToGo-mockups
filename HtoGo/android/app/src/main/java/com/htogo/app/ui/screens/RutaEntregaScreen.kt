@@ -142,6 +142,20 @@ fun RutaEntregaScreen(
                         }
                     } else {
                         LlegadoSheet(entrega, segundosRestantes)
+                        if (segundosRestantes > 0) {
+                            Spacer(Modifier.height(8.dp))
+                            TextButton(
+                                onClick = { segundosRestantes = 0 },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    "DEMO · Saltar los 10 min",
+                                    fontSize = 12.sp,
+                                    color = HToGoColors.TextTertiary,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
                         Spacer(Modifier.height(14.dp))
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             OutlinedButton(

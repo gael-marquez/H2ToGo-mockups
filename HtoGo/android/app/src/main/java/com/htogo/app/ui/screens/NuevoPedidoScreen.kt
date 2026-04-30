@@ -98,86 +98,6 @@ private fun PrimaryCtaButton(
 }
 
 @Composable
-private fun TipoPedidoCard(
-    icon: ImageVector,
-    title: String,
-    subtitle: String,
-    subtitleColor: Color,
-    selected: Boolean,
-    onSelect: () -> Unit
-) {
-    Surface(
-        shape = RoundedCornerShape(14.dp),
-        color = HToGoColors.Surface,
-        shadowElevation = 2.dp,
-        border = androidx.compose.foundation.BorderStroke(
-            1.5.dp, if (selected) HToGoColors.Primary else Color.Transparent
-        ),
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onSelect)
-    ) {
-        Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                Modifier.size(40.dp).clip(RoundedCornerShape(12.dp)).background(HToGoColors.PrimarySoft),
-                contentAlignment = Alignment.Center
-            ) { Icon(icon, null, tint = HToGoColors.Primary, modifier = Modifier.size(22.dp)) }
-            Spacer(Modifier.width(12.dp))
-            Column(Modifier.weight(1f)) {
-                Text(title, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = HToGoColors.TextPrimary)
-                Text(subtitle, fontSize = 12.sp, color = subtitleColor, maxLines = 1)
-            }
-            Box(
-                Modifier.size(20.dp).clip(CircleShape)
-                    .border(2.dp, if (selected) HToGoColors.Primary else HToGoColors.OutlineSoft, CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                if (selected) Box(Modifier.size(10.dp).clip(CircleShape).background(HToGoColors.Primary))
-            }
-        }
-    }
-}
-
-@Composable
-private fun PrecioMaximoCard(precio: Int, onPrecio: (Int) -> Unit) {
-    Surface(
-        shape = RoundedCornerShape(18.dp),
-        color = HToGoColors.Surface,
-        shadowElevation = 2.dp,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Row(Modifier.padding(18.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                Modifier.size(56.dp).clip(RoundedCornerShape(16.dp))
-                    .background(HToGoColors.AccentAmber.copy(alpha = 0.13f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(Icons.Filled.AttachMoney, null, tint = HToGoColors.AccentAmber,
-                    modifier = Modifier.size(28.dp))
-            }
-            Spacer(Modifier.width(14.dp))
-            Column(Modifier.weight(1f)) {
-                Text("Pagarás hasta", fontSize = 12.sp, color = HToGoColors.TextSecondary)
-                Text("$$precio MXN por garrafón",
-                    fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = HToGoColors.TextPrimary)
-                Text("Te asignamos la primera purificadora que cumpla",
-                    fontSize = 11.sp, color = HToGoColors.TextSecondary)
-            }
-            Row(
-                Modifier.background(HToGoColors.Background, RoundedCornerShape(99.dp)).padding(4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                StepperBtn("−", enabled = precio > 30) { onPrecio(precio - 5) }
-                Text(
-                    "$$precio",
-                    Modifier.widthIn(min = 36.dp).padding(horizontal = 4.dp),
-                    fontSize = 15.sp, fontWeight = FontWeight.Bold, color = HToGoColors.TextPrimary
-                )
-                StepperBtn("+", enabled = precio < 120) { onPrecio(precio + 5) }
-            }
-        }
-    }
-}
-
-@Composable
 private fun BrandRow(
     brands: List<WaterBrand>,
     selectedId: String,
@@ -454,9 +374,9 @@ private fun NotesField(value: String, onChange: (String) -> Unit) {
 }
 
 @Composable
-private fun ResumenCard(qty: Int, unit: Int = 35, envio: Int = 15, servicio: Int = 5) {
+private fun ResumenCard(qty: Int, unit: Int = 35, envio: Int = 15) {
     val sub = qty * unit
-    val total = sub + envio + servicio
+    val total = sub + envio
     Surface(
         shape = RoundedCornerShape(14.dp),
         color = HToGoColors.Surface,
@@ -466,7 +386,6 @@ private fun ResumenCard(qty: Int, unit: Int = 35, envio: Int = 15, servicio: Int
         Column(Modifier.padding(14.dp)) {
             ResumenRow("$qty × Garrafón 20 L", "$$sub.00")
             ResumenRow("Envío", "$$envio.00")
-            ResumenRow("Servicio", "$$servicio.00")
             Divider(Modifier.padding(vertical = 8.dp), color = HToGoColors.OutlineSoft)
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text("Total", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = HToGoColors.TextPrimary)
@@ -551,17 +470,15 @@ fun NuevoPedidoScreen(
     onBack: () -> Unit = {},
     onConfirm: () -> Unit = {}
 ) {
-    var tipo by remember { mutableStateOf(TipoPedido.DIRECTA) }
-    var precioMax by remember { mutableStateOf(60) }
     var qty by remember { mutableStateOf(3) }
     var selectedAddrId by remember { mutableStateOf("a1") }
     var selectedBrandId by remember { mutableStateOf("b1") }
     var notes by remember { mutableStateOf("Tocar timbre 4B, dejar en recepción si no contesto") }
 
     val brand = SAMPLE_BRANDS.first { it.id == selectedBrandId }
-    val envio = 15; val servicio = 5
-    val unitPrice = if (tipo == TipoPedido.ABIERTO) precioMax else brand.pricePerUnit
-    val total = qty * unitPrice + envio + servicio
+    val envio = 15
+    val unitPrice = brand.pricePerUnit
+    val total = qty * unitPrice + envio
     val selectedAddr = SAMPLE_ADDRESSES.first { it.id == selectedAddrId }
 
     Scaffold(
@@ -573,60 +490,24 @@ fun NuevoPedidoScreen(
             Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState())
         ) {
             Spacer(Modifier.height(18.dp))
-            SectionTitle("Tipo de pedido")
+            SectionTitle("Marca de garrafón")
             Spacer(Modifier.height(10.dp))
-            Column(
-                Modifier.padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+            BrandRow(
+                brands = SAMPLE_BRANDS,
+                selectedId = selectedBrandId,
+                onSelect = { selectedBrandId = it }
+            )
+            Row(
+                Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                TipoPedidoCard(
-                    icon = Icons.Filled.Storefront,
-                    title = "A una purificadora específica",
-                    subtitle = PURIFICADORA_NAME,
-                    subtitleColor = HToGoColors.Primary,
-                    selected = tipo == TipoPedido.DIRECTA,
-                    onSelect = { tipo = TipoPedido.DIRECTA }
+                Icon(Icons.Filled.Storefront, null, tint = HToGoColors.TextTertiary,
+                    modifier = Modifier.size(13.dp))
+                Spacer(Modifier.width(4.dp))
+                Text(
+                    "Marcas que vende $PURIFICADORA_NAME",
+                    fontSize = 11.sp, color = HToGoColors.TextTertiary
                 )
-                TipoPedidoCard(
-                    icon = Icons.Filled.AttachMoney,
-                    title = "Con precio máximo",
-                    subtitle = "Te asignamos la primera disponible",
-                    subtitleColor = HToGoColors.TextSecondary,
-                    selected = tipo == TipoPedido.ABIERTO,
-                    onSelect = { tipo = TipoPedido.ABIERTO }
-                )
-            }
-
-            if (tipo == TipoPedido.ABIERTO) {
-                Spacer(Modifier.height(18.dp))
-                SectionTitle("Precio máximo por garrafón")
-                Spacer(Modifier.height(10.dp))
-                Box(Modifier.padding(horizontal = 16.dp)) {
-                    PrecioMaximoCard(precio = precioMax) { precioMax = it }
-                }
-            }
-
-            if (tipo == TipoPedido.DIRECTA) {
-                Spacer(Modifier.height(18.dp))
-                SectionTitle("Marca de garrafón")
-                Spacer(Modifier.height(10.dp))
-                BrandRow(
-                    brands = SAMPLE_BRANDS,
-                    selectedId = selectedBrandId,
-                    onSelect = { selectedBrandId = it }
-                )
-                Row(
-                    Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(Icons.Filled.Storefront, null, tint = HToGoColors.TextTertiary,
-                        modifier = Modifier.size(13.dp))
-                    Spacer(Modifier.width(4.dp))
-                    Text(
-                        "Marcas que vende $PURIFICADORA_NAME",
-                        fontSize = 11.sp, color = HToGoColors.TextTertiary
-                    )
-                }
             }
 
             Spacer(Modifier.height(8.dp))
@@ -669,7 +550,7 @@ fun NuevoPedidoScreen(
             SectionTitle("Resumen")
             Spacer(Modifier.height(10.dp))
             Box(Modifier.padding(horizontal = 16.dp)) {
-                ResumenCard(qty = qty, unit = unitPrice, envio = envio, servicio = servicio)
+                ResumenCard(qty = qty, unit = unitPrice, envio = envio)
             }
             Spacer(Modifier.height(16.dp))
         }

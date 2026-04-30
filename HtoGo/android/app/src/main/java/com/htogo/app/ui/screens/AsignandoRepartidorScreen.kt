@@ -17,7 +17,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -81,7 +80,6 @@ fun AsignandoRepartidorScreen(
                     Text("#$orderId", fontSize = 13.sp, color = HToGoColors.TextSecondary)
                 }
             }
-            IconCircle(Icons.Filled.Share, onClick = {})
         }
 
         AssignSheet(
@@ -124,29 +122,41 @@ private fun SearchingMap(
     )
 
     Box(
-        modifier.background(
-            Brush.linearGradient(listOf(Color(0xFFDCEEF7), Color(0xFFE8F5FA), Color(0xFFD6EAF4)))
-        )
+        modifier.background(Color(0xFFE8EEF3))
     ) {
+        GenericMapBackdrop(Modifier.fillMaxSize())
+
         Surface(
-            shape = RoundedCornerShape(99.dp),
+            shape = RoundedCornerShape(20.dp),
             color = Color.White, shadowElevation = 6.dp,
-            modifier = Modifier.align(Alignment.TopCenter).padding(top = 110.dp)
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 110.dp, start = 16.dp, end = 16.dp)
+                .fillMaxWidth()
         ) {
-            Row(
-                Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                CircularProgressIndicator(
-                    Modifier.size(14.dp), strokeWidth = 2.dp, color = HToGoColors.Primary
+            Column {
+                Row(
+                    Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    CircularProgressIndicator(
+                        Modifier.size(14.dp), strokeWidth = 2.dp, color = HToGoColors.Primary
+                    )
+                    Spacer(Modifier.width(10.dp))
+                    val bannerText = if (modoDirecto)
+                        "Esperando que $purificadoraName acepte..."
+                    else
+                        "Buscando purificadoras con tu precio máximo..."
+                    Text(bannerText,
+                        fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = HToGoColors.TextPrimary)
+                }
+                LinearProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(3.dp),
+                    color = HToGoColors.Primary,
+                    trackColor = HToGoColors.PrimarySoft
                 )
-                Spacer(Modifier.width(10.dp))
-                val bannerText = if (modoDirecto)
-                    "Esperando que $purificadoraName acepte..."
-                else
-                    "Buscando purificadoras con tu precio máximo..."
-                Text(bannerText,
-                    fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = HToGoColors.TextPrimary)
             }
         }
 
@@ -172,12 +182,110 @@ private fun SearchingMap(
         Surface(
             shape = RoundedCornerShape(12.dp), color = Color.White, shadowElevation = 4.dp,
             modifier = Modifier.align(Alignment.TopEnd)
-                .padding(top = 200.dp, end = 14.dp).size(42.dp).clickable {}
+                .padding(top = 220.dp, end = 14.dp).size(42.dp).clickable {}
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(Icons.Filled.MyLocation, null, tint = HToGoColors.TextPrimary,
                     modifier = Modifier.size(20.dp))
             }
+        }
+    }
+}
+
+@Composable
+private fun GenericMapBackdrop(modifier: Modifier = Modifier) {
+    androidx.compose.foundation.Canvas(modifier) {
+        val w = size.width
+        val h = size.height
+        val land = Color(0xFFE8EEF3)
+        val park = Color(0xFFC8E6C9)
+        val water = Color(0xFFB3D9E8)
+        val road = Color.White
+        val roadEdge = Color(0xFFD6DBE0)
+        val building = Color(0xFFDDE3E8)
+
+        drawRect(land)
+
+        drawRect(
+            color = water,
+            topLeft = androidx.compose.ui.geometry.Offset(0f, h * 0.78f),
+            size = androidx.compose.ui.geometry.Size(w, h * 0.22f)
+        )
+        drawRect(
+            color = park,
+            topLeft = androidx.compose.ui.geometry.Offset(w * 0.62f, h * 0.10f),
+            size = androidx.compose.ui.geometry.Size(w * 0.30f, h * 0.18f)
+        )
+        drawRect(
+            color = park,
+            topLeft = androidx.compose.ui.geometry.Offset(w * 0.05f, h * 0.55f),
+            size = androidx.compose.ui.geometry.Size(w * 0.18f, h * 0.14f)
+        )
+
+        val buildings = listOf(
+            Triple(0.04f, 0.08f, 0.20f to 0.10f),
+            Triple(0.28f, 0.08f, 0.18f to 0.12f),
+            Triple(0.04f, 0.22f, 0.14f to 0.10f),
+            Triple(0.22f, 0.24f, 0.20f to 0.10f),
+            Triple(0.48f, 0.10f, 0.10f to 0.18f),
+            Triple(0.50f, 0.32f, 0.14f to 0.12f),
+            Triple(0.70f, 0.34f, 0.18f to 0.10f),
+            Triple(0.04f, 0.38f, 0.20f to 0.12f),
+            Triple(0.30f, 0.40f, 0.16f to 0.10f),
+            Triple(0.50f, 0.50f, 0.20f to 0.14f),
+            Triple(0.76f, 0.55f, 0.18f to 0.12f),
+            Triple(0.30f, 0.66f, 0.18f to 0.10f),
+        )
+        buildings.forEach { (x, y, sz) ->
+            val (sw, sh) = sz
+            drawRect(
+                color = building,
+                topLeft = androidx.compose.ui.geometry.Offset(w * x, h * y),
+                size = androidx.compose.ui.geometry.Size(w * sw, h * sh)
+            )
+        }
+
+        val hLines = listOf(0.20f, 0.36f, 0.52f, 0.72f)
+        hLines.forEach { ratio ->
+            drawLine(
+                color = roadEdge,
+                start = androidx.compose.ui.geometry.Offset(0f, h * ratio - 8f),
+                end = androidx.compose.ui.geometry.Offset(w, h * ratio - 8f),
+                strokeWidth = 1f
+            )
+            drawLine(
+                color = road,
+                start = androidx.compose.ui.geometry.Offset(0f, h * ratio),
+                end = androidx.compose.ui.geometry.Offset(w, h * ratio),
+                strokeWidth = 14f
+            )
+            drawLine(
+                color = roadEdge,
+                start = androidx.compose.ui.geometry.Offset(0f, h * ratio + 8f),
+                end = androidx.compose.ui.geometry.Offset(w, h * ratio + 8f),
+                strokeWidth = 1f
+            )
+        }
+        val vLines = listOf(0.24f, 0.46f, 0.68f)
+        vLines.forEach { ratio ->
+            drawLine(
+                color = roadEdge,
+                start = androidx.compose.ui.geometry.Offset(w * ratio - 8f, 0f),
+                end = androidx.compose.ui.geometry.Offset(w * ratio - 8f, h),
+                strokeWidth = 1f
+            )
+            drawLine(
+                color = road,
+                start = androidx.compose.ui.geometry.Offset(w * ratio, 0f),
+                end = androidx.compose.ui.geometry.Offset(w * ratio, h),
+                strokeWidth = 12f
+            )
+            drawLine(
+                color = roadEdge,
+                start = androidx.compose.ui.geometry.Offset(w * ratio + 8f, 0f),
+                end = androidx.compose.ui.geometry.Offset(w * ratio + 8f, h),
+                strokeWidth = 1f
+            )
         }
     }
 }

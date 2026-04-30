@@ -27,6 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.htogo.app.ui.components.RepartidorBottomBar
+import com.htogo.app.ui.components.RepartidorTab
 import com.htogo.app.ui.theme.HToGoColors
 import com.htogo.app.ui.theme.HToGoTheme
 
@@ -47,7 +49,12 @@ private data class ResumenIngresos(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun IngresosScreen(onBack: () -> Unit = {}) {
+fun IngresosScreen(
+    onBack: () -> Unit = {},
+    onInicio: () -> Unit = {},
+    onNegocio: () -> Unit = {},
+    onPerfil: () -> Unit = {}
+) {
     var tab by remember { mutableStateOf(TabIngresos.HOY) }
 
     val resumen = remember {
@@ -65,7 +72,18 @@ fun IngresosScreen(onBack: () -> Unit = {}) {
         )
     }
 
-    Scaffold(containerColor = HToGoColors.Background) { padding ->
+    Scaffold(
+        containerColor = HToGoColors.Background,
+        bottomBar = {
+            RepartidorBottomBar(
+                selected = RepartidorTab.INGRESOS,
+                onInicio = onInicio,
+                onNegocio = onNegocio,
+                onIngresos = {},
+                onPerfil = onPerfil
+            )
+        }
+    ) { padding ->
         Column(Modifier.padding(padding).fillMaxSize()) {
             Box(
                 Modifier

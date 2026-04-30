@@ -173,7 +173,7 @@ fun HomeClienteScreen(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 QuickActionTile(Icons.Filled.History, "Repetir último", "5 garrafones", Modifier.weight(1f), {})
-                QuickActionTile(Icons.Filled.Schedule, "Programar", "Suscripción", Modifier.weight(1f), {})
+                QuickActionTile(Icons.Filled.Schedule, "Programar", "Pedido recurrente", Modifier.weight(1f), {})
             }
 
             Spacer(Modifier.height(24.dp))
@@ -183,9 +183,9 @@ fun HomeClienteScreen(
                 color = HToGoColors.TextPrimary,
                 modifier = Modifier.padding(horizontal = 20.dp))
             Spacer(Modifier.height(8.dp))
-            PurificadoraMini("Aguas Del Valle", "0.8 km", "12 min", onAbrirPurificadora, onNuevoPedido)
-            PurificadoraMini("HidroExpress BJ", "1.4 km", "18 min", onAbrirPurificadora, onNuevoPedido)
-            PurificadoraMini("AquaPura Nápoles", "2.1 km", "25 min", onAbrirPurificadora, onNuevoPedido)
+            PurificadoraMini("Aguas Del Valle", "0.8 km", onAbrirPurificadora, onNuevoPedido)
+            PurificadoraMini("HidroExpress BJ", "1.4 km", onAbrirPurificadora, onNuevoPedido)
+            PurificadoraMini("AquaPura Nápoles", "2.1 km", onAbrirPurificadora, onNuevoPedido)
 
             Spacer(Modifier.height(96.dp))
         }
@@ -282,7 +282,6 @@ private fun QuickActionTile(
 private fun PurificadoraMini(
     nombre: String,
     distancia: String,
-    eta: String,
     onAbrir: () -> Unit,
     onPedir: () -> Unit
 ) {
@@ -315,7 +314,7 @@ private fun PurificadoraMini(
                 Column {
                     Text(nombre, fontSize = 14.sp, fontWeight = FontWeight.SemiBold,
                         color = HToGoColors.TextPrimary)
-                    Text("$distancia · $eta",
+                    Text(distancia,
                         fontSize = 12.sp, color = HToGoColors.TextSecondary)
                 }
             }

@@ -19,6 +19,7 @@ import com.htogo.app.ui.screens.PerfilRepartidorScreen
 import com.htogo.app.ui.screens.RegistroScreen
 import com.htogo.app.ui.screens.RutaEntregaScreen
 import com.htogo.app.ui.screens.SeguimientoPedidoScreen
+import com.htogo.app.ui.screens.SolicitudPedidoProgramadoScreen
 import com.htogo.app.ui.screens.SplashOnboardingScreen
 import com.htogo.app.ui.screens.VerificacionTelefonoScreen
 
@@ -92,7 +93,7 @@ fun HToGoNavHost(
         }
         composable(HToGoRoutes.SEGUIMIENTO) {
             SeguimientoPedidoScreen(
-                onBack             = { navController.popBackStack() },
+                onBack             = { navController.navigateAndClear(HToGoRoutes.HOME_CLIENTE) },
                 onPedidoEntregado  = { navController.navigateAndClear(HToGoRoutes.HOME_CLIENTE) },
                 onAbrirPurificadora = { navController.navigate(HToGoRoutes.PERFIL_PURIFICADORA) }
             )
@@ -115,12 +116,12 @@ fun HToGoNavHost(
         // ───────── Repartidor ─────────
         composable(HToGoRoutes.HOME_REPARTIDOR) {
             HomeRepartidorScreen(
-                onPedidos    = { navController.navigate(HToGoRoutes.PEDIDOS_DISPONIBLES) },
-                onInventario = { navController.navigate(HToGoRoutes.INVENTARIO) },
-                onIngresos   = { navController.navigate(HToGoRoutes.INGRESOS) },
-                onPerfil     = { navController.navigate(HToGoRoutes.PERFIL_REPARTIDOR) },
-                onRuta       = { navController.navigate(HToGoRoutes.RUTA_ENTREGA) },
-                onSwitchRol  = { navController.navigate(HToGoRoutes.HOME_CLIENTE) }
+                onInventario       = { navController.navigate(HToGoRoutes.INVENTARIO) },
+                onIngresos         = { navController.navigate(HToGoRoutes.INGRESOS) },
+                onPerfil           = { navController.navigate(HToGoRoutes.PERFIL_REPARTIDOR) },
+                onRuta             = { navController.navigate(HToGoRoutes.RUTA_ENTREGA) },
+                onPedidoProgramado = { navController.navigate(HToGoRoutes.PEDIDO_PROGRAMADO) },
+                onSwitchRol        = { navController.navigate(HToGoRoutes.HOME_CLIENTE) }
             )
         }
         composable(HToGoRoutes.PEDIDOS_DISPONIBLES) {
@@ -129,9 +130,18 @@ fun HToGoNavHost(
                 onAceptar  = { navController.navigate(HToGoRoutes.RUTA_ENTREGA) }
             )
         }
+        composable(HToGoRoutes.PEDIDO_PROGRAMADO) {
+            SolicitudPedidoProgramadoScreen(
+                onBack        = { navController.popBackStack() },
+                onIniciarRuta = { navController.navigateAndClear(HToGoRoutes.RUTA_ENTREGA) }
+            )
+        }
         composable(HToGoRoutes.INVENTARIO) {
             InventarioVehiculoScreen(
-                onBack = { navController.popBackStack() }
+                onBack    = { navController.popBackStack() },
+                onInicio  = { navController.navigateAndClear(HToGoRoutes.HOME_REPARTIDOR) },
+                onIngresos = { navController.navigate(HToGoRoutes.INGRESOS) },
+                onPerfil  = { navController.navigate(HToGoRoutes.PERFIL_REPARTIDOR) }
             )
         }
         composable(HToGoRoutes.RUTA_ENTREGA) {
@@ -142,13 +152,19 @@ fun HToGoNavHost(
         }
         composable(HToGoRoutes.INGRESOS) {
             IngresosScreen(
-                onBack = { navController.popBackStack() }
+                onBack    = { navController.popBackStack() },
+                onInicio  = { navController.navigateAndClear(HToGoRoutes.HOME_REPARTIDOR) },
+                onNegocio = { navController.navigate(HToGoRoutes.INVENTARIO) },
+                onPerfil  = { navController.navigate(HToGoRoutes.PERFIL_REPARTIDOR) }
             )
         }
         composable(HToGoRoutes.PERFIL_REPARTIDOR) {
             PerfilRepartidorScreen(
-                onBack   = { navController.popBackStack() },
-                onLogout = { navController.navigateAndClear(HToGoRoutes.LOGIN) }
+                onBack    = { navController.popBackStack() },
+                onLogout  = { navController.navigateAndClear(HToGoRoutes.LOGIN) },
+                onInicio  = { navController.navigateAndClear(HToGoRoutes.HOME_REPARTIDOR) },
+                onNegocio = { navController.navigate(HToGoRoutes.INVENTARIO) },
+                onIngresos = { navController.navigate(HToGoRoutes.INGRESOS) }
             )
         }
     }

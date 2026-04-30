@@ -275,12 +275,6 @@ private fun FloatingTopBar(orderId: String, onBack: () -> Unit) {
                     fontSize = 13.sp, color = HToGoColors.TextSecondary)
             }
         }
-        Surface(
-            shape = CircleShape, color = Color.White, shadowElevation = 4.dp,
-            modifier = Modifier.size(40.dp).clickable { }
-        ) { Box(contentAlignment = Alignment.Center) {
-            Icon(Icons.Filled.Share, null, tint = HToGoColors.TextPrimary)
-        } }
     }
 }
 
