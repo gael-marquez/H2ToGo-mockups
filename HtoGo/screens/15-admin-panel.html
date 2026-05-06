@@ -319,6 +319,25 @@
         </div>
       </div>
 
+      <!-- Solicitudes pendientes destacadas -->
+      <div class="bg-white rounded-xl border border-slate-200 mb-5 overflow-hidden">
+        <div class="px-5 py-3 border-b border-slate-100 flex items-center gap-3 flex-wrap">
+          <div class="w-9 h-9 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center"><span class="mi">approval</span></div>
+          <div class="min-w-0">
+            <div class="font-semibold text-sm flex items-center gap-2">
+              Solicitudes de cambio · pendientes
+              <span id="dashSolNuevas" class="hidden text-[10px] font-bold uppercase tracking-wide bg-rose-100 text-rose-700 border border-rose-200 px-1.5 py-0.5 rounded">0 nuevas</span>
+            </div>
+            <div class="text-xs text-slate-500"><b id="dashSolPendCount">0</b> esperan tu revisión · resaltadas las creadas en las últimas 24 h</div>
+          </div>
+          <button onclick="setView('solicitudes')" class="ml-auto text-xs text-brand-600 font-semibold hover:underline whitespace-nowrap flex items-center gap-1">
+            Ver todas <span class="mi text-[14px]">arrow_forward</span>
+          </button>
+        </div>
+        <div id="dashSolList" class="divide-y divide-slate-100"></div>
+        <div id="dashSolEmpty" class="hidden px-5 py-8 text-center text-sm text-slate-400">No hay solicitudes pendientes en este momento.</div>
+      </div>
+
       <!-- Top repartidores + actividad reciente -->
       <div class="grid grid-cols-3 gap-4">
         <!-- Top repartidores -->
@@ -1168,14 +1187,14 @@ const estadoStyles = {
 };
 
 const solicitudes = [
-  { id:'SOL-0124', repartidor:'Carlos Mendoza',   iniciales:'CM', color:'bg-brand-600',    negocio:'Purificadora Aqua Pura',  tipo:'Precio producto',  estado:'pendiente', fecha:'28 abr 2026 · 9:14 AM',  actual:'Ciel 20L $45',                propuesto:'Ciel 20L $48',          justif:'El proveedor subió el precio mayoreo $2 por garrafón.' },
-  { id:'SOL-0123', repartidor:'Roberto Silva',    iniciales:'RS', color:'bg-amber-500',    negocio:'Purificadora del Valle',  tipo:'Agregar vehículo', estado:'pendiente', fecha:'28 abr 2026 · 8:42 AM',  actual:'2 vehículos registrados',     propuesto:'+ Moto Italika DS-150 (placa MAB-732)', justif:'Compré una moto para entregas chicas en horario pico.' },
-  { id:'SOL-0122', repartidor:'Elena Ramírez',    iniciales:'ER', color:'bg-indigo-500',   negocio:'Agua Clara',              tipo:'Foto perfil',      estado:'pendiente', fecha:'27 abr 2026 · 6:30 PM',  actual:'Foto antigua (2024)',         propuesto:'Foto nueva con uniforme',  justif:'Cambié la foto para que se me reconozca con el nuevo uniforme.' },
-  { id:'SOL-0121', repartidor:'Pedro Domínguez',  iniciales:'PD', color:'bg-teal-500',     negocio:'HidroPlus BJ',            tipo:'Datos vehículo',   estado:'pendiente', fecha:'27 abr 2026 · 4:18 PM',  actual:'Pickup Frontier · placa RPK-285-A', propuesto:'Pickup Frontier · placa MJB-441-B', justif:'Cambié de placas tras renovar el seguro.' },
-  { id:'SOL-0120', repartidor:'José López',       iniciales:'JL', color:'bg-purple-500',   negocio:'Purificadora Aqua Pura',  tipo:'Foto perfil',      estado:'pendiente', fecha:'27 abr 2026 · 2:55 PM',  actual:'Foto borrosa',                propuesto:'Foto nueva con buena luz',   justif:'La foto anterior estaba muy oscura.' },
-  { id:'SOL-0119', repartidor:'Carlos Mendoza',   iniciales:'CM', color:'bg-brand-600',    negocio:'Purificadora Aqua Pura',  tipo:'Agregar producto', estado:'pendiente', fecha:'26 abr 2026 · 11:02 AM', actual:'3 marcas activas',            propuesto:'+ Bonafont 20L $48',         justif:'Quiero ofrecer Bonafont además de Ciel y Epura.' },
-  { id:'SOL-0118', repartidor:'Roberto Silva',    iniciales:'RS', color:'bg-amber-500',    negocio:'Purificadora del Valle',  tipo:'Dirección base',   estado:'pendiente', fecha:'26 abr 2026 · 9:48 AM',  actual:'Av. Universidad 1840',        propuesto:'Av. Cuauhtémoc 1102, BJ',    justif:'Nos mudamos a una bodega más grande.' },
-  { id:'SOL-0117', repartidor:'Elena Ramírez',    iniciales:'ER', color:'bg-indigo-500',   negocio:'Agua Clara',              tipo:'Eliminar vehículo',estado:'pendiente', fecha:'25 abr 2026 · 5:30 PM',  actual:'Bicicleta Mercurio (BIC-021)', propuesto:'Eliminar de la flota',       justif:'La bici ya no la usamos, está fuera de servicio.' },
+  { id:'SOL-0124', repartidor:'Carlos Mendoza',   iniciales:'CM', color:'bg-brand-600',    negocio:'Purificadora Aqua Pura',  tipo:'Precio producto',  estado:'pendiente', fecha:'28 abr 2026 · 9:14 AM',  hace:'hace 1 h', esNueva:true,  actual:'Ciel 20L $45',                propuesto:'Ciel 20L $48',          justif:'El proveedor subió el precio mayoreo $2 por garrafón.' },
+  { id:'SOL-0123', repartidor:'Roberto Silva',    iniciales:'RS', color:'bg-amber-500',    negocio:'Purificadora del Valle',  tipo:'Agregar vehículo', estado:'pendiente', fecha:'28 abr 2026 · 8:42 AM',  hace:'hace 2 h', esNueva:true,  actual:'2 vehículos registrados',     propuesto:'+ Moto Italika DS-150 (placa MAB-732)', justif:'Compré una moto para entregas chicas en horario pico.' },
+  { id:'SOL-0122', repartidor:'Elena Ramírez',    iniciales:'ER', color:'bg-indigo-500',   negocio:'Agua Clara',              tipo:'Foto perfil',      estado:'pendiente', fecha:'27 abr 2026 · 6:30 PM', hace:'hace 16 h', esNueva:true, actual:'Foto antigua (2024)',         propuesto:'Foto nueva con uniforme',  justif:'Cambié la foto para que se me reconozca con el nuevo uniforme.' },
+  { id:'SOL-0121', repartidor:'Pedro Domínguez',  iniciales:'PD', color:'bg-teal-500',     negocio:'HidroPlus BJ',            tipo:'Datos vehículo',   estado:'pendiente', fecha:'27 abr 2026 · 4:18 PM',  hace:'hace 18 h', esNueva:false, actual:'Pickup Frontier · placa RPK-285-A', propuesto:'Pickup Frontier · placa MJB-441-B', justif:'Cambié de placas tras renovar el seguro.' },
+  { id:'SOL-0120', repartidor:'José López',       iniciales:'JL', color:'bg-purple-500',   negocio:'Purificadora Aqua Pura',  tipo:'Foto perfil',      estado:'pendiente', fecha:'27 abr 2026 · 2:55 PM',  hace:'hace 20 h', esNueva:false, actual:'Foto borrosa',                propuesto:'Foto nueva con buena luz',   justif:'La foto anterior estaba muy oscura.' },
+  { id:'SOL-0119', repartidor:'Carlos Mendoza',   iniciales:'CM', color:'bg-brand-600',    negocio:'Purificadora Aqua Pura',  tipo:'Agregar producto', estado:'pendiente', fecha:'26 abr 2026 · 11:02 AM', hace:'hace 2 d',  esNueva:false, actual:'3 marcas activas',            propuesto:'+ Bonafont 20L $48',         justif:'Quiero ofrecer Bonafont además de Ciel y Epura.' },
+  { id:'SOL-0118', repartidor:'Roberto Silva',    iniciales:'RS', color:'bg-amber-500',    negocio:'Purificadora del Valle',  tipo:'Dirección base',   estado:'pendiente', fecha:'26 abr 2026 · 9:48 AM',  hace:'hace 2 d',  esNueva:false, actual:'Av. Universidad 1840',        propuesto:'Av. Cuauhtémoc 1102, BJ',    justif:'Nos mudamos a una bodega más grande.' },
+  { id:'SOL-0117', repartidor:'Elena Ramírez',    iniciales:'ER', color:'bg-indigo-500',   negocio:'Agua Clara',              tipo:'Eliminar vehículo',estado:'pendiente', fecha:'25 abr 2026 · 5:30 PM',  hace:'hace 3 d',  esNueva:false, actual:'Bicicleta Mercurio (BIC-021)', propuesto:'Eliminar de la flota',       justif:'La bici ya no la usamos, está fuera de servicio.' },
 
   { id:'SOL-0116', repartidor:'Carlos Mendoza',   iniciales:'CM', color:'bg-brand-600',    negocio:'Purificadora Aqua Pura',  tipo:'Foto perfil',      estado:'aprobada',  fecha:'24 abr 2026 · 10:00 AM', actual:'Foto antigua',                propuesto:'Foto profesional nueva',     justif:'Foto profesional para el directorio.' },
   { id:'SOL-0115', repartidor:'Pedro Domínguez',  iniciales:'PD', color:'bg-teal-500',     negocio:'HidroPlus BJ',            tipo:'Precio producto',  estado:'aprobada',  fecha:'23 abr 2026 · 3:12 PM',  actual:'Epura 20L $42',                propuesto:'Epura 20L $44',              justif:'Aumento por inflación trimestral.' },
@@ -1266,18 +1285,35 @@ function renderOrders() {
 
 /* ===== Render Solicitudes ===== */
 function renderSolicitudes() {
-  const list = solicitudes.filter(s => currentSolTab === 'todas' ? true : s.estado === currentSolTab);
+  const list = solicitudes
+    .filter(s => currentSolTab === 'todas' ? true : s.estado === currentSolTab)
+    .slice()
+    .sort((a, b) => {
+      // Pendientes primero; dentro de pendientes, las "nuevas" arriba
+      if (a.estado === 'pendiente' && b.estado !== 'pendiente') return -1;
+      if (b.estado === 'pendiente' && a.estado !== 'pendiente') return 1;
+      if (a.esNueva && !b.esNueva) return -1;
+      if (b.esNueva && !a.esNueva) return 1;
+      return 0;
+    });
   document.getElementById('solCount').textContent = list.length;
   document.getElementById('solRows').innerHTML = list.map(s => {
     const e = solEstadoStyles[s.estado];
+    const destacar = s.esNueva && s.estado === 'pendiente';
+    const rowCls = destacar
+      ? 'bg-amber-50/40 hover:bg-amber-50 border-l-4 border-l-amber-400'
+      : 'hover:bg-slate-50';
+    const nuevoBadge = destacar
+      ? `<span class="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wide bg-rose-100 text-rose-700 border border-rose-200 px-1.5 py-0.5 rounded ml-2"><span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span> Nuevo</span>`
+      : '';
     return `
-    <tr class="hover:bg-slate-50">
+    <tr class="${rowCls}">
       <td class="px-5 py-3">
         <div class="flex items-center gap-3">
           <div class="w-9 h-9 rounded-full ${s.color} text-white text-xs font-bold flex items-center justify-center">${s.iniciales}</div>
           <div class="min-w-0">
-            <div class="font-semibold text-slate-900 truncate">${s.repartidor}</div>
-            <div class="text-[11px] text-slate-500 font-mono truncate">#${s.id}</div>
+            <div class="font-semibold text-slate-900 truncate flex items-center">${s.repartidor}${nuevoBadge}</div>
+            <div class="text-[11px] text-slate-500 font-mono truncate">#${s.id}${s.hace ? ` · ${s.hace}` : ''}</div>
           </div>
         </div>
       </td>
@@ -1298,6 +1334,65 @@ function renderSolicitudes() {
       </td>
     </tr>`;
   }).join('') || `<tr><td colspan="6" class="px-5 py-12 text-center text-sm text-slate-400">No hay solicitudes en esta categoría</td></tr>`;
+
+  renderDashSolicitudes();
+}
+
+/* ===== Widget dashboard: solicitudes pendientes recientes ===== */
+function renderDashSolicitudes() {
+  const pendientes = solicitudes.filter(s => s.estado === 'pendiente');
+  const nuevas = pendientes.filter(s => s.esNueva);
+  const top = pendientes
+    .slice()
+    .sort((a, b) => Number(!!b.esNueva) - Number(!!a.esNueva))
+    .slice(0, 4);
+
+  const countEl = document.getElementById('dashSolPendCount');
+  const nuevasBadge = document.getElementById('dashSolNuevas');
+  const list = document.getElementById('dashSolList');
+  const empty = document.getElementById('dashSolEmpty');
+  if (!countEl || !list || !empty) return;
+
+  countEl.textContent = pendientes.length;
+  if (nuevas.length > 0) {
+    nuevasBadge.textContent = `${nuevas.length} nueva${nuevas.length === 1 ? '' : 's'}`;
+    nuevasBadge.classList.remove('hidden');
+  } else {
+    nuevasBadge.classList.add('hidden');
+  }
+
+  if (top.length === 0) {
+    list.innerHTML = '';
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+
+  list.innerHTML = top.map(s => {
+    const destacar = !!s.esNueva;
+    const containerCls = destacar
+      ? 'flex items-center gap-3 px-5 py-3 bg-amber-50/40 border-l-4 border-l-amber-400 hover:bg-amber-50 cursor-pointer'
+      : 'flex items-center gap-3 px-5 py-3 hover:bg-slate-50 cursor-pointer';
+    const nuevoBadge = destacar
+      ? `<span class="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wide bg-rose-100 text-rose-700 border border-rose-200 px-1.5 py-0.5 rounded"><span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span> Nuevo</span>`
+      : `<span class="text-[10px] text-slate-400 font-medium">${s.hace || ''}</span>`;
+    return `
+      <div class="${containerCls}" onclick='openSolicitud("${s.id}")'>
+        <div class="w-9 h-9 rounded-full ${s.color} text-white text-xs font-bold flex items-center justify-center shrink-0">${s.iniciales}</div>
+        <div class="min-w-0 flex-1">
+          <div class="flex items-center gap-2">
+            <div class="text-sm font-semibold text-slate-900 truncate">${s.repartidor}</div>
+            ${nuevoBadge}
+          </div>
+          <div class="text-[11px] text-slate-500 truncate"><b class="text-slate-700">${s.tipo}</b> · ${s.negocio} · #${s.id}</div>
+        </div>
+        <div class="hidden md:flex items-center gap-1 shrink-0">
+          <button onclick='event.stopPropagation(); aprobarSolicitud("${s.id}")' class="h-8 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1"><span class="mi text-[14px]">check</span> Aprobar</button>
+          <button onclick='event.stopPropagation(); openRechazo("${s.id}")' class="h-8 px-3 rounded-lg border border-rose-300 text-rose-600 hover:bg-rose-50 text-xs font-semibold flex items-center gap-1"><span class="mi text-[14px]">close</span> Rechazar</button>
+        </div>
+      </div>
+    `;
+  }).join('');
 }
 
 /* ===== Tabs ===== */
