@@ -13,8 +13,10 @@ object HToGoRoutes {
 
     // Cliente
     const val HOME_CLIENTE       = "home_c"        // 05
-    const val PERFIL_PURIFICADORA = "purif_c"      // 05c — NUEVA
-    const val NUEVO_PEDIDO       = "form"          // 06
+    const val BUSCAR_PURIFICADORAS = "purif_list"  // lista de purificadoras
+    const val PERFIL_PURIFICADORA = "purif_c"      // 05c — detalle
+    const val NUEVO_PEDIDO       = "form"          // 06 — pedido directo
+    const val NUEVO_PEDIDO_ABIERTO = "form_abierto" // 06b — precio máximo
     const val ASIGNANDO          = "buscando"      // 07a
     const val SEGUIMIENTO        = "track"         // 07
     const val HISTORIAL_CLIENTE  = "hist_c"        // 08
@@ -23,6 +25,7 @@ object HToGoRoutes {
     // Repartidor
     const val HOME_REPARTIDOR    = "home_r"        // 05b
     const val INVENTARIO         = "inv"           // 10
+    const val PRODUCTOS_PRECIOS  = "prods"         // CU-23 catálogo del negocio
     const val PEDIDOS_DISPONIBLES = "ped"          // 11
     const val RUTA_ENTREGA       = "ruta"          // 12
     const val INGRESOS           = "ingresos"      // 13 (antes "ganancias")

@@ -40,6 +40,8 @@ import com.htogo.app.ui.theme.HToGoTheme
 @Composable
 fun HomeClienteScreen(
     onNuevoPedido: () -> Unit = {},
+    onElegirPurificadora: () -> Unit = {},
+    onPedirAbierto: () -> Unit = {},
     onTrackPedido: () -> Unit = {},
     onHistorial: () -> Unit = {},
     onPerfil: () -> Unit = {},
@@ -121,7 +123,8 @@ fun HomeClienteScreen(
                     }
                     Spacer(Modifier.height(16.dp))
                     Card(
-                        Modifier.fillMaxWidth(),
+                        onClick = onElegirPurificadora,
+                        modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(14.dp),
                         colors = CardDefaults.cardColors(containerColor = Color.White)
                     ) {
@@ -160,11 +163,11 @@ fun HomeClienteScreen(
             ) {
                 QuickActionTile(
                     Icons.Filled.Storefront, "Elegir purificadora",
-                    "Pide a un negocio específico", Modifier.weight(1f), onNuevoPedido
+                    "Pide a un negocio específico", Modifier.weight(1f), onElegirPurificadora
                 )
                 QuickActionTile(
                     Icons.Filled.AttachMoney, "Pedir con precio máximo",
-                    "Te asignamos el primero disponible", Modifier.weight(1f), onNuevoPedido
+                    "Te asignamos el primero disponible", Modifier.weight(1f), onPedirAbierto
                 )
             }
             Spacer(Modifier.height(12.dp))

@@ -5,17 +5,20 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.htogo.app.ui.screens.AsignandoRepartidorScreen
+import com.htogo.app.ui.screens.BuscarPurificadorasScreen
 import com.htogo.app.ui.screens.HistorialPedidosScreen
 import com.htogo.app.ui.screens.HomeClienteScreen
 import com.htogo.app.ui.screens.HomeRepartidorScreen
 import com.htogo.app.ui.screens.IngresosScreen
 import com.htogo.app.ui.screens.InventarioVehiculoScreen
 import com.htogo.app.ui.screens.LoginScreen
+import com.htogo.app.ui.screens.NuevoPedidoAbiertoScreen
 import com.htogo.app.ui.screens.NuevoPedidoScreen
 import com.htogo.app.ui.screens.PedidosDisponiblesScreen
 import com.htogo.app.ui.screens.PerfilClienteScreen
 import com.htogo.app.ui.screens.PerfilPurificadoraScreen
 import com.htogo.app.ui.screens.PerfilRepartidorScreen
+import com.htogo.app.ui.screens.ProductosPreciosScreen
 import com.htogo.app.ui.screens.RegistroScreen
 import com.htogo.app.ui.screens.RutaEntregaScreen
 import com.htogo.app.ui.screens.SeguimientoPedidoScreen
@@ -61,18 +64,36 @@ fun HToGoNavHost(
         // ───────── Cliente ─────────
         composable(HToGoRoutes.HOME_CLIENTE) {
             HomeClienteScreen(
-                onNuevoPedido      = { navController.navigate(HToGoRoutes.NUEVO_PEDIDO) },
-                onTrackPedido      = { navController.navigate(HToGoRoutes.SEGUIMIENTO) },
-                onHistorial        = { navController.navigate(HToGoRoutes.HISTORIAL_CLIENTE) },
-                onPerfil           = { navController.navigate(HToGoRoutes.PERFIL_CLIENTE) },
-                onAbrirPurificadora = { navController.navigate(HToGoRoutes.PERFIL_PURIFICADORA) },
-                onSwitchRol        = { navController.navigate(HToGoRoutes.HOME_REPARTIDOR) }
+                onNuevoPedido        = { navController.navigate(HToGoRoutes.NUEVO_PEDIDO) },
+                onElegirPurificadora = { navController.navigate(HToGoRoutes.BUSCAR_PURIFICADORAS) },
+                onPedirAbierto       = { navController.navigate(HToGoRoutes.NUEVO_PEDIDO_ABIERTO) },
+                onTrackPedido        = { navController.navigate(HToGoRoutes.SEGUIMIENTO) },
+                onHistorial          = { navController.navigate(HToGoRoutes.HISTORIAL_CLIENTE) },
+                onPerfil             = { navController.navigate(HToGoRoutes.PERFIL_CLIENTE) },
+                onAbrirPurificadora  = { navController.navigate(HToGoRoutes.PERFIL_PURIFICADORA) },
+                onSwitchRol          = { navController.navigate(HToGoRoutes.HOME_REPARTIDOR) }
+            )
+        }
+        composable(HToGoRoutes.BUSCAR_PURIFICADORAS) {
+            BuscarPurificadorasScreen(
+                onBack              = { navController.popBackStack() },
+                onAbrirPurificadora = { navController.navigate(HToGoRoutes.PERFIL_PURIFICADORA) }
             )
         }
         composable(HToGoRoutes.PERFIL_PURIFICADORA) {
             PerfilPurificadoraScreen(
                 onBack  = { navController.popBackStack() },
                 onPedir = { navController.navigate(HToGoRoutes.NUEVO_PEDIDO) }
+            )
+        }
+        composable(HToGoRoutes.NUEVO_PEDIDO_ABIERTO) {
+            NuevoPedidoAbiertoScreen(
+                onBack    = { navController.popBackStack() },
+                onConfirm = {
+                    navController.navigate(HToGoRoutes.ASIGNANDO) {
+                        popUpTo(HToGoRoutes.HOME_CLIENTE)
+                    }
+                }
             )
         }
         composable(HToGoRoutes.NUEVO_PEDIDO) {
@@ -141,7 +162,13 @@ fun HToGoNavHost(
                 onBack    = { navController.popBackStack() },
                 onInicio  = { navController.navigateAndClear(HToGoRoutes.HOME_REPARTIDOR) },
                 onIngresos = { navController.navigate(HToGoRoutes.INGRESOS) },
-                onPerfil  = { navController.navigate(HToGoRoutes.PERFIL_REPARTIDOR) }
+                onPerfil  = { navController.navigate(HToGoRoutes.PERFIL_REPARTIDOR) },
+                onProductosPrecios = { navController.navigate(HToGoRoutes.PRODUCTOS_PRECIOS) }
+            )
+        }
+        composable(HToGoRoutes.PRODUCTOS_PRECIOS) {
+            ProductosPreciosScreen(
+                onBack = { navController.popBackStack() }
             )
         }
         composable(HToGoRoutes.RUTA_ENTREGA) {

@@ -7,18 +7,26 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.EventAvailable
 import androidx.compose.material.icons.filled.HelpOutline
+import androidx.compose.material.icons.filled.AttachMoney
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.HourglassBottom
 import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.LocalShipping
 import androidx.compose.material.icons.filled.MoveToInbox
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.QrCode2
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.material.icons.filled.SwapHoriz
@@ -55,7 +63,15 @@ private data class MarcaBaseStock(
     val proveedor: String,
     val enBase: Int,
     val maximoBase: Int,
-    val accent: Color
+    val accent: Color,
+    val lotes: List<Lote> = emptyList()
+)
+
+private data class Lote(
+    val codigo: String,
+    val cantidad: Int,
+    val fechaCaducidad: String,
+    val diasParaCaducar: Int
 )
 
 private data class MarcaVehiculoStock(
@@ -76,7 +92,8 @@ fun InventarioVehiculoScreen(
     onBack: () -> Unit = {},
     onInicio: () -> Unit = {},
     onIngresos: () -> Unit = {},
-    onPerfil: () -> Unit = {}
+    onPerfil: () -> Unit = {},
+    onProductosPrecios: () -> Unit = {}
 ) {
     var tab by remember { mutableStateOf(TabInventario.EN_BASE) }
     var showRegistrarEntrada by remember { mutableStateOf(false) }
@@ -86,9 +103,26 @@ fun InventarioVehiculoScreen(
 
     val marcasBase = remember {
         listOf(
-            MarcaBaseStock("a", "CIE", "Marca A", "20 L", 45.0, "Proveedor 1", 18, 50, HToGoColors.Primary),
-            MarcaBaseStock("b", "BON", "Marca B", "20 L", 48.0, "Proveedor 2", 12, 50, HToGoColors.AccentEmerald),
-            MarcaBaseStock("c", "EPU", "Marca C", "20 L", 42.0, "Proveedor 3", 8, 50, HToGoColors.AccentAmber)
+            MarcaBaseStock(
+                "a", "CIE", "Marca A", "20 L", 45.0, "Proveedor 1", 18, 50, HToGoColors.Primary,
+                lotes = listOf(
+                    Lote("L-2026-04-12", 6, "12 oct 2026", 159),
+                    Lote("L-2026-04-22", 12, "22 oct 2026", 169)
+                )
+            ),
+            MarcaBaseStock(
+                "b", "BON", "Marca B", "20 L", 48.0, "Proveedor 2", 12, 50, HToGoColors.AccentEmerald,
+                lotes = listOf(
+                    Lote("L-2026-03-30", 4, "30 may 2026", 24),
+                    Lote("L-2026-04-18", 8, "18 sep 2026", 135)
+                )
+            ),
+            MarcaBaseStock(
+                "c", "EPU", "Marca C", "20 L", 42.0, "Proveedor 3", 8, 50, HToGoColors.AccentAmber,
+                lotes = listOf(
+                    Lote("L-2026-04-05", 8, "20 may 2026", 14)
+                )
+            )
         )
     }
 
@@ -147,6 +181,7 @@ fun InventarioVehiculoScreen(
             when (tab) {
                 TabInventario.EN_BASE -> {
                     item { ResumenBaseCard() }
+                    item { ProductosPreciosShortcut(onProductosPrecios) }
                     item { SectionTitle("Marcas en base · 3") }
                     items(marcasBase) { m -> MarcaBaseCard(m) }
                     item {
@@ -283,6 +318,55 @@ private fun TabPill(label: String, icon: ImageVector, selected: Boolean, modifie
                 fontSize = 11.sp,
                 fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
                 maxLines = 1
+            )
+        }
+    }
+}
+
+@Composable
+private fun ProductosPreciosShortcut(onClick: () -> Unit) {
+    Surface(
+        shape = RoundedCornerShape(14.dp),
+        color = Color.White,
+        border = BorderStroke(1.dp, HToGoColors.OutlineSoft),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+    ) {
+        Row(
+            Modifier.padding(14.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                Modifier
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(HToGoColors.PrimarySoft),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    Icons.Filled.AttachMoney, null,
+                    tint = HToGoColors.Primary,
+                    modifier = Modifier.size(22.dp)
+                )
+            }
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Text(
+                    "Productos y precios",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = HToGoColors.TextPrimary
+                )
+                Text(
+                    "Gestiona el catálogo del negocio · CU-23",
+                    fontSize = 11.sp,
+                    color = HToGoColors.TextSecondary
+                )
+            }
+            Icon(
+                Icons.Filled.ChevronRight, null,
+                tint = HToGoColors.TextTertiary
             )
         }
     }
@@ -461,7 +545,56 @@ private fun MarcaBaseCard(m: MarcaBaseStock) {
                 Spacer(Modifier.width(4.dp))
                 Text(estadoTxt, fontSize = 11.sp, color = estadoColor, fontWeight = FontWeight.SemiBold)
             }
+            if (m.lotes.isNotEmpty()) {
+                Spacer(Modifier.height(10.dp))
+                LotesResumen(m.lotes)
+            }
         }
+    }
+}
+
+@Composable
+private fun LotesResumen(lotes: List<Lote>) {
+    val proximo = lotes.minByOrNull { it.diasParaCaducar }!!
+    val (color, badgeBg, etiqueta) = when {
+        proximo.diasParaCaducar <= 15 -> Triple(HToGoColors.AccentRose, HToGoColors.AccentRose.copy(alpha = .12f), "Próximo a caducar")
+        proximo.diasParaCaducar <= 45 -> Triple(HToGoColors.AccentAmber, HToGoColors.AccentAmber.copy(alpha = .14f), "Caducidad cercana")
+        else -> Triple(HToGoColors.AccentEmerald, HToGoColors.AccentEmerald.copy(alpha = .12f), "Caducidad OK")
+    }
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(10.dp))
+            .background(HToGoColors.Background)
+            .padding(horizontal = 10.dp, vertical = 8.dp)
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Filled.EventAvailable, null, tint = HToGoColors.Primary, modifier = Modifier.size(14.dp))
+            Spacer(Modifier.width(6.dp))
+            Text(
+                "${lotes.size} ${if (lotes.size == 1) "lote activo" else "lotes activos"}",
+                fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = HToGoColors.TextSecondary,
+                modifier = Modifier.weight(1f)
+            )
+            Surface(
+                shape = RoundedCornerShape(99.dp),
+                color = badgeBg
+            ) {
+                Row(
+                    Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Filled.HourglassBottom, null, tint = color, modifier = Modifier.size(11.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text(etiqueta, fontSize = 10.sp, color = color, fontWeight = FontWeight.SemiBold)
+                }
+            }
+        }
+        Spacer(Modifier.height(4.dp))
+        Text(
+            "Próximo: ${proximo.codigo} · vence ${proximo.fechaCaducidad} (${proximo.diasParaCaducar} d) · ${proximo.cantidad} pzas",
+            fontSize = 10.sp, color = HToGoColors.TextTertiary
+        )
     }
 }
 
@@ -656,18 +789,26 @@ private fun VField(label: String, value: String, modifier: Modifier = Modifier, 
 @Composable
 private fun RegistrarEntradaDialog(marcas: List<MarcaBaseStock>, onDismiss: () -> Unit) {
     var seleccionada by remember { mutableStateOf(marcas.firstOrNull()?.id ?: "") }
+    val seleccionMarca = marcas.firstOrNull { it.id == seleccionada } ?: marcas.first()
     var cantidad by remember { mutableStateOf(10) }
+    var codigoLote by remember { mutableStateOf("L-2026-05-001") }
+    var fechaCaducidad by remember { mutableStateOf("") }
+    val caducidadValida = fechaCaducidad.length == 10
     Dialog(onDismissRequest = onDismiss) {
         Surface(
             shape = RoundedCornerShape(20.dp),
             color = Color.White,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Column(Modifier.padding(20.dp)) {
-                Text("Registrar entrada de inventario", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+            Column(
+                Modifier
+                    .padding(20.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                Text("Registrar entrada por lote", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    "Agrega los garrafones que entraron a la base del negocio.",
+                    "Cada entrada se registra como un lote con su propia caducidad para llevar control PEPS.",
                     fontSize = 13.sp, color = HToGoColors.TextSecondary
                 )
                 Spacer(Modifier.height(14.dp))
@@ -712,7 +853,87 @@ private fun RegistrarEntradaDialog(marcas: List<MarcaBaseStock>, onDismiss: () -
                     }
                 }
                 Spacer(Modifier.height(14.dp))
-                Text("CANTIDAD", fontSize = 11.sp, color = HToGoColors.TextSecondary, fontWeight = FontWeight.SemiBold)
+                Text("DATOS DEL LOTE", fontSize = 11.sp, color = HToGoColors.TextSecondary, fontWeight = FontWeight.SemiBold)
+                Spacer(Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = codigoLote,
+                    onValueChange = { codigoLote = it.take(20) },
+                    label = { Text("Código de lote") },
+                    leadingIcon = { Icon(Icons.Filled.QrCode2, null) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    supportingText = { Text("Identificador del proveedor (ej. L-2026-05-001)") }
+                )
+                Spacer(Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = fechaCaducidad,
+                    onValueChange = { raw ->
+                        val digits = raw.filter(Char::isDigit).take(8)
+                        fechaCaducidad = buildString {
+                            digits.forEachIndexed { i, c ->
+                                if (i == 2 || i == 4) append('/')
+                                append(c)
+                            }
+                        }
+                    },
+                    label = { Text("Fecha de caducidad") },
+                    leadingIcon = { Icon(Icons.Filled.CalendarMonth, null) },
+                    placeholder = { Text("DD/MM/AAAA") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                        keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
+                    ),
+                    isError = fechaCaducidad.isNotEmpty() && !caducidadValida,
+                    supportingText = {
+                        Text(
+                            if (fechaCaducidad.isNotEmpty() && !caducidadValida)
+                                "Formato: DD/MM/AAAA"
+                            else
+                                "Se registrará como un lote independiente"
+                        )
+                    }
+                )
+                if (seleccionMarca.lotes.isNotEmpty()) {
+                    Spacer(Modifier.height(12.dp))
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = HToGoColors.Background,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(Modifier.padding(12.dp)) {
+                            Text(
+                                "LOTES ACTIVOS DE ${seleccionMarca.nombre.uppercase()}",
+                                fontSize = 10.sp, fontWeight = FontWeight.SemiBold,
+                                color = HToGoColors.TextSecondary
+                            )
+                            Spacer(Modifier.height(6.dp))
+                            seleccionMarca.lotes.forEach { lote ->
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.padding(vertical = 2.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Filled.HourglassBottom, null,
+                                        tint = if (lote.diasParaCaducar <= 15) HToGoColors.AccentRose
+                                        else if (lote.diasParaCaducar <= 45) HToGoColors.AccentAmber
+                                        else HToGoColors.AccentEmerald,
+                                        modifier = Modifier.size(13.dp)
+                                    )
+                                    Spacer(Modifier.width(6.dp))
+                                    Text(lote.codigo, fontSize = 11.sp, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
+                                    Text("${lote.cantidad} pzas", fontSize = 11.sp, color = HToGoColors.TextSecondary)
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(lote.fechaCaducidad, fontSize = 11.sp, color = HToGoColors.TextTertiary)
+                                }
+                            }
+                        }
+                    }
+                }
+                Spacer(Modifier.height(14.dp))
+                Text("CANTIDAD DEL LOTE", fontSize = 11.sp, color = HToGoColors.TextSecondary, fontWeight = FontWeight.SemiBold)
                 QtyStepper(cantidad, max = 12) { cantidad = it }
                 Text(
                     "Máximo 12 (espacio disponible en base)",
@@ -730,12 +951,13 @@ private fun RegistrarEntradaDialog(marcas: List<MarcaBaseStock>, onDismiss: () -
                     ) { Text("Cancelar") }
                     Button(
                         onClick = onDismiss,
+                        enabled = caducidadValida && codigoLote.isNotBlank() && cantidad > 0,
                         modifier = Modifier
                             .weight(1f)
                             .height(46.dp),
                         shape = RoundedCornerShape(23.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = HToGoColors.Primary)
-                    ) { Text("Confirmar entrada", fontWeight = FontWeight.SemiBold) }
+                    ) { Text("Registrar lote", fontWeight = FontWeight.SemiBold) }
                 }
             }
         }
