@@ -8,6 +8,7 @@ object HToGoRoutes {
     // Onboarding / auth
     const val SPLASH    = "splash"     // 01
     const val REGISTRO  = "registro"   // 02
+    const val AVISO_PRIVACIDAD = "aviso_privacidad" // 02b
     const val OTP       = "otp"        // 03 — verificación teléfono
     const val LOGIN     = "login"      // 04
 

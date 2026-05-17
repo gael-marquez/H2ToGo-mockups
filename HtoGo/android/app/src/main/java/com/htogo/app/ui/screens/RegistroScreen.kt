@@ -56,7 +56,8 @@ private data class PurificadoraExistente(
 fun RegistroScreen(
     onBack: () -> Unit = {},
     onSubmit: () -> Unit = {},
-    onLogin: () -> Unit = {}
+    onLogin: () -> Unit = {},
+    onAvisoPrivacidad: () -> Unit = {}
 ) {
     var rol by remember { mutableStateOf(RolUsuario.CLIENTE) }
     var nombre by remember { mutableStateOf("") }
@@ -226,11 +227,20 @@ fun RegistroScreen(
                     onCheckedChange = { aceptaTerminos = it },
                     colors = CheckboxDefaults.colors(checkedColor = HToGoColors.Primary)
                 )
-                Text(
-                    "Acepto los Términos y el Aviso de Privacidad",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = HToGoColors.TextSecondary
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        "Acepto los Términos y el ",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = HToGoColors.TextSecondary
+                    )
+                    Text(
+                        "Aviso de Privacidad",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = HToGoColors.Primary,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.clickable(onClick = onAvisoPrivacidad)
+                    )
+                }
             }
 
             Spacer(Modifier.height(4.dp))
