@@ -119,6 +119,11 @@
   }
   .check-box .material-icons{color:#fff;font-size:14px;}
   .terms .t{font-size:14px;color:var(--text-2);}
+  .terms .link{
+    border:0;background:transparent;padding:0;cursor:pointer;
+    color:var(--primary);font:600 14px 'Roboto',sans-serif;
+    text-decoration:none;
+  }
 
   /* Botones */
   .btn-primary{
@@ -227,7 +232,7 @@
         <!-- Términos -->
         <div class="terms">
           <div class="check-box"><span class="material-icons">check</span></div>
-          <div class="t">Acepto los Términos y el Aviso de Privacidad</div>
+          <div class="t">Acepto los Términos y el <button type="button" class="link" onclick="window.open('02b-aviso-privacidad.html', '_blank')">Aviso de Privacidad</button></div>
         </div>
 
         <button class="btn-primary">Regístrate</button>

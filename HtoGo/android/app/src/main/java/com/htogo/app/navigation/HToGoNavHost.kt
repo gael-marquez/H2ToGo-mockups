@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.htogo.app.ui.screens.AsignandoRepartidorScreen
+import com.htogo.app.ui.screens.AvisoPrivacidadScreen
 import com.htogo.app.ui.screens.BuscarPurificadorasScreen
 import com.htogo.app.ui.screens.HistorialPedidosScreen
 import com.htogo.app.ui.screens.HomeClienteScreen
@@ -51,7 +52,13 @@ fun HToGoNavHost(
             RegistroScreen(
                 onBack    = { navController.popBackStack() },
                 onSubmit  = { navController.navigate(HToGoRoutes.OTP) },
-                onLogin   = { navController.navigate(HToGoRoutes.LOGIN) }
+                onLogin   = { navController.navigate(HToGoRoutes.LOGIN) },
+                onAvisoPrivacidad = { navController.navigate(HToGoRoutes.AVISO_PRIVACIDAD) }
+            )
+        }
+        composable(HToGoRoutes.AVISO_PRIVACIDAD) {
+            AvisoPrivacidadScreen(
+                onBack = { navController.popBackStack() }
             )
         }
         composable(HToGoRoutes.OTP) {

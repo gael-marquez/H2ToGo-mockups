@@ -13,7 +13,7 @@ if (-not (Test-Path $screensDir)) {
 function Get-Category($name) {
   switch -Regex ($name) {
     '^01-'                       { 'General';      return }
-    '^0[234]-'                   { 'Auth';         return }
+    '^0[234][a-z]?-'             { 'Auth';         return }
     '^(05-|06-|07-|08-|09-|1[0-3]-)' { 'Cliente';      return }
     '^(14-|15-|16-|17-|18-|19-)' { 'Repartidor';   return }
     '^(20-|21-)'                 { 'Purificadora'; return }
