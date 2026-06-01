@@ -226,8 +226,10 @@
     :root{ --scale:0.42; }
     .header-inner{padding:14px 16px;}
     main{padding:16px;}
-    .filters{width:100%;order:2;overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;}
+    .filters{width:100%;order:2;flex-wrap:wrap;padding-bottom:4px;}
     .filter{flex:0 0 auto;}
+    .grid{grid-template-columns:1fr;}
+    .card[data-type="web"]{ grid-column:auto; }
     .modal-nav.prev{left:8px;}
     .modal-nav.next{right:8px;}
   }
@@ -257,8 +259,7 @@
   </main>
 
   <footer>
-    Generado desde <code>htogo-mockups/screens/*.html</code> (portado de <code>HtoGo/android/...screens/*.kt</code>) &middot;
-    Para regenerar: <code>powershell -File htogo-mockups/build.ps1</code>
+    Desarrollada por Gael Alejandro M&aacute;rquez Rodr&iacute;guez y Brandon Trejo Hern&aacute;ndez
   </footer>
 
   <div class="modal" id="modal" role="dialog" aria-modal="true">
